@@ -35,7 +35,7 @@ class RedditStoryGenerator:
         """Create a text clip for the Reddit question and generate its audio."""
         try:
             # Generate audio for the Reddit question
-            reddit_question_audio_path: str = generate_text_to_speech("openai", self.openai_api_key, reddit_question, voice="echo") # this could be elevenlabs or azure_openai
+            reddit_question_audio_path: str = generate_text_to_speech("edge", self.openai_api_key, reddit_question, voice="en-US-ChristopherNeural") # this could be elevenlabs or azure_openai
             logging.info(f"Reddit question audio path: {reddit_question_audio_path}")
             # Getting audio duration for further processing
             reddit_question_audio_clip: AudioFileClip = AudioFileClip(reddit_question_audio_path)
@@ -104,7 +104,7 @@ class RedditStoryGenerator:
             """ Handle Script Generation and Process """
             # Generate the script or use the provided script
             logging.info(f"Generating script for the video topic: {video_topic}")
-            script: dict = generate_script("openai", self.openai_api_key, video_topic, model="gpt-3.5-turbo-0125")
+            script: dict = generate_script("openai", self.openai_api_key, video_topic, model="grok-3-latest")
             
             if not script:
                 logging.error("Failed to generate script.")

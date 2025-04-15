@@ -4,7 +4,7 @@ import json
 import sys
 import os
 
-def generate_openai_script(api_key: str, prompt: str, model: str = "gpt-3.5-turbo-0125") -> str:
+def generate_openai_script(api_key: str, prompt: str, model: str = "grok-3-latest") -> str:
     """
     Generate a script using OpenAI
     """
@@ -13,7 +13,7 @@ def generate_openai_script(api_key: str, prompt: str, model: str = "gpt-3.5-turb
     yaml_path = os.path.join(os.path.dirname(current_dir), "prompts", "script.yaml")
     
     system_prompt = load_yaml_file(yaml_path)["system_prompt"]
-    client = OpenAI(api_key=api_key)
+    client = OpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
     response = client.chat.completions.create(
         model=model,
         response_format={"type": "json_object"},

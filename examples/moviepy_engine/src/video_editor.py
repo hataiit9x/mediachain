@@ -48,12 +48,13 @@ def download_image(image_url):
 
 class VideoEditor:
     def __init__(self):
-        self.openai = OpenAI(api_key=openai_api_key)
+        self.openai = OpenAI(api_key=openai_api_key, base_url="https://api.x.ai/v1")
         self.base_dir = os.path.dirname(os.path.abspath(__file__))
 
     def download_video(self, youtube_url, quality="480"):
         try:
-            downloads_dir = os.path.join(self.base_dir, '..', 'downloads')
+            # Use absolute path for downloads directory
+            downloads_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'downloads'))
             os.makedirs(downloads_dir, exist_ok=True)
             
             # First extract info without downloading to get video details
@@ -84,29 +85,33 @@ class VideoEditor:
             with YoutubeDL(ydl_opts) as ydl:
                 ydl.download([youtube_url])
 
-            logging.info("Video downloaded successfully.")
+            logging.info(f"Video downloaded successfully to: {video_path}")
             return video_path
         except Exception as e:
             logging.error(f"Error downloading video: {e}")
             return None
 
     def cut_video(self, video_path, start_time, end_time):
+        video_path = os.path.abspath(video_path)
         if not os.path.exists(video_path):
-            logging.error(f"Video file does not exist, {video_path}")
-            return
+            logging.error(f"Video file does not exist: {video_path}")
+            return None
+            
         try:
             unique_id = uuid.uuid4()
-            assets_dir = os.path.join(self.base_dir, '..', 'assets')
+            assets_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'assets'))
             os.makedirs(assets_dir, exist_ok=True)
             output_path = os.path.join(assets_dir, f"cut_video_{unique_id}.mp4")
             
             clip = VideoFileClip(video_path)
             cut_clip = clip.subclip(start_time, end_time)
             cut_clip.write_videofile(output_path)
-            logging.info("Video cut successfully.")
+            clip.close()
+            logging.info(f"Video cut successfully. Output: {output_path}")
             return output_path
         except Exception as e:
             logging.error(f"Error cutting video: {e}")
+            return None
 
     def load_subtitles(self, subtitles_path):
         try:
@@ -188,7 +193,7 @@ class VideoEditor:
         # Enhance prompts and generate images
         for i, image_object in enumerate(images):
             prompt = image_object["prompt"]
-            enhanced_prompt = enhance_prompt("openai", openai_api_key, prompt, model="gpt-3.5-turbo-0125")
+            enhanced_prompt = enhance_prompt("openai", openai_api_key, prompt, model="grok-3-latest")
             images[i]["enhanced_prompt"] = enhanced_prompt
 
         logging.info("Generating images")

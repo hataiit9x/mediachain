@@ -26,8 +26,8 @@ def enhance_prompt_azure(api_key: str, prompt: str, azure_config: dict, model: s
     response_json = json.loads(response.choices[0].message.content)
     return response_json["image_prompt"]
 
-def enhance_prompt_openai(api_key: str, prompt: str, model: str = "gpt-3.5-turbo"):
-    client = OpenAI(api_key=api_key)
+def enhance_prompt_openai(api_key: str, prompt: str, model: str = "grok-3-latest"):
+    client = OpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
     system_prompt = enhance_system_prompt
     response = client.chat.completions.create(
         model=model,
